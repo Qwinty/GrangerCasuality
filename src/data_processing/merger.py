@@ -48,7 +48,7 @@ def merge_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, how: str = 'inner') -
 
 def check_completeness(df: pd.DataFrame) -> None:
     """
-    Checks the merged DataFrame for missing values and time gaps.
+    Проверяет объединенный DataFrame на наличие пропущенных значений и временных пробелов.
     """
     print("Checking merged data completeness...")
     missing_values = df.isnull().sum()

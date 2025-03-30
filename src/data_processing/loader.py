@@ -18,7 +18,7 @@ MORTALITY_COL_MAP = {
 
 
 def load_temperature_data(filepath: str) -> pd.DataFrame:
-    """Loads the temperature data from a text file."""
+    """Загружает данные о температуре из текстового файла."""
     print(f"Loading temperature data from: {filepath}")
     try:
         df = pd.read_csv(filepath, delimiter=';', encoding='utf-8')
@@ -38,7 +38,7 @@ def load_temperature_data(filepath: str) -> pd.DataFrame:
 
 
 def load_secondary_data(filepath: str) -> pd.DataFrame:
-    """Loads the secondary dataset (DTP or Mortality) from a CSV file."""
+    """Загружает вторичный набор данных (ДТП или Смертность) из CSV файла."""
     print(f"Loading secondary data from: {filepath}")
     try:
         if 'mortality' in filepath:
@@ -105,7 +105,7 @@ def load_secondary_data(filepath: str) -> pd.DataFrame:
 
 
 def load_all_data(temp_path: str, secondary_path: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Loads both temperature and secondary datasets."""
+    """Загружает как данные о температуре, так и вторичные наборы данных."""
     df_temp = load_temperature_data(temp_path)
     df_secondary = load_secondary_data(secondary_path)
     return df_temp, df_secondary

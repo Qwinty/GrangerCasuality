@@ -1,5 +1,5 @@
 # src/analysis/stationarity.py
-# Functions for checking time series stationarity using ADF and KPSS tests.
+# Функции для проверки стационарности временных рядов с использованием тестов ADFиd KPSs.
 
 import pandas as pd
 from statsmodels.tsa.stattools import adfuller, kpss
@@ -9,35 +9,34 @@ import numpy as np
 
 def check_stationarity_adf(series: pd.Series, significance_level: float = 0.05, regression: str = 'c') -> Tuple[bool, float]:
     """
-    Performs the Augmented Dickey-Fuller (ADF) test for stationarity.
+    Выполняет расширенный тест Дики-Фуллера (ADF) на стационарность.
 
-    Null Hypothesis (H0): The series has a unit root (non-stationary).
-    Alternative Hypothesis (H1): The series does not have a unit root (stationary).
+    Нулевая гипотеза (H0): Ряд имеет единичный корень (нестационарный).
+    Альтернативная гипотеза (H1): Ряд не имеет единичного корня (стационарный).
 
     Args:
-        series: Time series data.
-        significance_level: Threshold for p-value.
-        regression: Type of regression ('c', 'ct', 'ctt', 'n').
-                    'c' - constant only (default)
-                    'ct' - constant and trend
-                    'ctt' - constant, linear and quadratic trend
-                    'n' - no constant, no trend
+        series: Данные временного ряда.
+        significance_level: Пороговое значение для p-value.
+        regression: Тип регрессии ('c', 'ct', 'ctt', 'n').
+                    'c' - только константа (по умолчанию)
+                    'ct' - константа и тренд
+                    'ctt' - константа, линейный и квадратичный тренд
+                    'n' - без константы, без тренда
 
     Returns:
-        Tuple (is_stationary, p_value). is_stationary is True if H0 is rejected.
+        Кортеж (is_stationary, p_value). is_stationary равно True, если H0 отвергается.
     """
     print(
-        f"Performing ADF test on series: {series.name} (Regression: {regression})")
+        f"Выполнение ADF теста для ряда: {series.name} (Регрессия: {regression})")
     try:
-        # Drop NA before test
         result = adfuller(series.dropna(), regression=regression)
         p_value = result[1]
         is_stationary = p_value < significance_level
-        print(f"ADF Test Results for {series.name}:")
-        print(f"  Test Statistic: {result[0]:.4f}")
-        print(f"  P-value: {p_value:.4f}")
-        print(f"  Lags Used: {result[2]}")
-        print(f"  Is Stationary (p < {significance_level}): {is_stationary}")
+        print(f"Результаты ADF теста для {series.name}:")
+        print(f"  Статистика теста: {result[0]:.4f}")
+        print(f"  P-значение: {p_value:.4f}")
+        print(f"  Использовано лагов: {result[2]}")
+        print(f"  Стационарность (p < {significance_level}): {is_stationary}")
         return is_stationary, p_value
     except Exception as e:
         print(f"Error during ADF test for {series.name}: {e}")
@@ -46,43 +45,40 @@ def check_stationarity_adf(series: pd.Series, significance_level: float = 0.05, 
 
 def check_stationarity_kpss(series: pd.Series, significance_level: float = 0.05, regression: str = 'c') -> Tuple[bool, float]:
     """
-    Performs the Kwiatkowski-Phillips-Schmidt-Shin (KPSS) test for stationarity.
+    Выполняет тест Квятковского-Филлипса-Шмидта-Шина (KPSS) на стационарность.
 
-    Null Hypothesis (H0): The series is trend-stationary (or level-stationary if regression='c').
-    Alternative Hypothesis (H1): The series has a unit root (non-stationary).
+    Нулевая гипотеза (H0): Ряд является стационарным относительно тренда (или уровня, если regression='c').
+    Альтернативная гипотеза (H1): Ряд имеет единичный корень (нестационарный).
 
     Args:
-        series: Time series data.
-        significance_level: Threshold for p-value.
-        regression: Type of regression ('c', 'ct').
-                    'c' - test is for level stationarity (default)
-                    'ct' - test is for trend stationarity
+        series: Данные временного ряда.
+        significance_level: Пороговое значение для p-value.
+        regression: Тип регрессии ('c', 'ct').
+                    'c' - тест на стационарность уровня (по умолчанию)
+                    'ct' - тест на стационарность тренда
 
     Returns:
-        Tuple (is_stationary, p_value). is_stationary is True if H0 is NOT rejected.
-        Note: Interpretation is opposite to ADF test.
+        Кортеж (is_stationary, p_value). is_stationary равно True, если H0 НЕ отвергается.
+        Примечание: Интерпретация противоположна тесту ADF.
     """
     # Pre-check for constant series (zero variance)
     if series.dropna().var() < 1e-10:  # Use a small threshold for floating point
         print(
-            f"KPSS test skipped for {series.name}: Series variance is effectively zero (constant value). Assuming stationary.")
+            f"KPSS тест пропущен для {series.name}: Дисперсия ряда практически нулевая (постоянное значение). Предполагаем стационарность.")
         return True, 1.0
 
     print(
-        f"Performing KPSS test on series: {series.name} (Regression: {regression})")
+        f"Выполнение KPSS теста для ряда: {series.name} (Регрессия: {regression})")
     try:
-        # Note: nlags='auto' is generally recommended
         result = kpss(series.dropna(), regression=regression,
-                      nlags='auto')  # Drop NA
+                      nlags='auto')
         p_value = result[1]
-        # KPSS interpretation: If p-value is LOW, reject H0 (series is non-stationary)
         is_stationary = p_value >= significance_level
-        print(f"KPSS Test Results for {series.name}:")
-        print(f"  Test Statistic: {result[0]:.4f}")
-        print(
-            f"  P-value: {p_value:.4f} (Note: p-values are interpolated and may be capped at 0.01 or 0.1)")
-        print(f"  Lags Used: {result[2]}")
-        print(f"  Is Stationary (p >= {significance_level}): {is_stationary}")
+        print(f"Результаты KPSS теста для {series.name}:")
+        print(f"  Статистика теста: {result[0]:.4f}")
+        print(f"  P-значение: {p_value:.4f} (Примечание: p-значения интерполированы и могут быть ограничены 0.01илиr 0.1)")
+        print(f"  Использовано лагов: {result[2]}")
+        print(f"  Стационарность (p >= {significance_level}): {is_stationary}")
         return is_stationary, p_value
     except Exception as e:
         print(f"Error during KPSS test for {series.name}: {e}")
@@ -91,30 +87,30 @@ def check_stationarity_kpss(series: pd.Series, significance_level: float = 0.05,
 
 def apply_differencing(data, order: int = 1):
     """
-    Applies differencing to a series or dataframe.
+    Применяет дифференцирование к ряду или датафрейму.
     
     Args:
-        data: Time series data (pd.Series or pd.DataFrame)
-        order: Differencing order
+        data: Данные временного ряда (pd.Series или pd.DataFrame)
+        order: Порядок дифференцирования
         
     Returns:
-        Differenced data (same type as input)
+        Дифференцированные данные (того же типа, что и входные)
     """
     if order <= 0:
         return data
     if isinstance(data, pd.Series):
-        print(f"Applying differencing of order {order} to series: {data.name}")
+        print(f"Применение дифференцирования порядка {order} к ряду: {data.name}")
         return data.diff(order).dropna()
     else:  # DataFrame
-        print(f"Applying differencing of order {order} to dataframe with columns: {list(data.columns)}")
+        print(f"Применение дифференцирования порядка {order} к датафрейму с колонками: {list(data.columns)}")
         return data.diff(order).dropna()
 
 
 def check_stationarity_on_dataframe(df: pd.DataFrame, adf_level: float = 0.05, kpss_level: float = 0.05) -> Dict[str, Dict[str, Tuple[bool, float]]]:
-    """Runs ADF and KPSS tests on all columns of a DataFrame."""
+    """Выполняет тесты ADF и KPSS для всех столбцов DataFrame."""
     results = {}
     for col in df.columns:
-        print(f"\n--- Checking Stationarity for: {col} ---")
+        print(f"\n--- Проверка стационарности для: {col} ---")
         adf_stat, adf_p = check_stationarity_adf(
             df[col], significance_level=adf_level)
         kpss_stat, kpss_p = check_stationarity_kpss(
@@ -128,13 +124,13 @@ def check_stationarity_on_dataframe(df: pd.DataFrame, adf_level: float = 0.05, k
 
 if __name__ == '__main__':
     # Example usage (for testing purposes)
-    print("\nTesting stationarity functions...")
+    print("\nТестирование функций проверки стационарности...")
 
-    # Create sample data
+    # Создание тестовых данных
     idx = pd.period_range(start='2020-01', periods=100, freq='M')
-    # Non-stationary (random walk)
+    # Нестационарные данные (случайное блуждание)
     non_stationary_data = np.random.randn(100).cumsum()
-    # Stationary data
+    # Стационарные данные
     stationary_data = np.random.randn(100)
 
     df_test = pd.DataFrame({
@@ -142,25 +138,25 @@ if __name__ == '__main__':
         'NonStationary': non_stationary_data
     }, index=idx)
 
-    print("\nSample Test DataFrame:")
-    print(df_test.head())
+    print("Тестовый датафрейм:")
+    print(df_test.head(5))
 
-    # Test on DataFrame
+    # Тест на DataFrame
     stationarity_results = check_stationarity_on_dataframe(df_test)
-    print("\nStationarity Test Results Summary:")
+    print("\nСводка результатов тестов стационарности:")
     print(stationarity_results)
 
-    # Test differencing
+    # Тест дифференцирования
     diff_series = apply_differencing(df_test['NonStationary'], order=1)
-    print("\nNon-Stationary Series after 1st order differencing:")
-    print(diff_series.head())
+    print("\nНестационарный ряд после дифференцирования 1-го порядка:")
+    print(diff_series.head(5))
 
-    print("\n--- Checking Stationarity for Differenced Series ---")
+    print("\n--- Проверка стационарности для дифференцированного ряда ---")
     adf_stat_diff, adf_p_diff = check_stationarity_adf(diff_series)
     kpss_stat_diff, kpss_p_diff = check_stationarity_kpss(diff_series)
     print(
-        f"Differenced ADF: Stationary={adf_stat_diff}, p-value={adf_p_diff:.4f}")
+        f"ADF для дифференцированного ряда: Стационарность={adf_stat_diff}, p-значение={adf_p_diff:.4f}")
     print(
-        f"Differenced KPSS: Stationary={kpss_stat_diff}, p-value={kpss_p_diff:.4f}")
+        f"KPSS для дифференцированного ряда: Стационарность={kpss_stat_diff}, p-значение={kpss_p_diff:.4f}")
 
-    print("\nStationarity test finished.")
+    print("\nТестирование стационарности завершено.")

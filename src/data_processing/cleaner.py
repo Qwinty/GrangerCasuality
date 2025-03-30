@@ -9,15 +9,15 @@ from typing import Optional
 
 def unify_timestamps(df: pd.DataFrame, date_col: str, target_format: str = '%Y-%m') -> pd.DataFrame:
     """
-    Unifies timestamps to a monthly format (YYYY-MM) and sets it as the index.
+    Унифицирует временные метки в месячный формат (YYYY-MM) и устанавливает его в качестве индекса.
 
     Args:
-        df: Input DataFrame.
-        date_col: Name of the column containing date/time information.
-        target_format: The target string format for the monthly period.
+        df: Входной DataFrame.
+        date_col: Имя столбца, содержащего информацию о дате/времени.
+        target_format: Целевой строковый формат для месячного периода.
 
     Returns:
-        DataFrame with a PeriodIndex ('YYYY-MM').
+        DataFrame с PeriodIndex ('YYYY-MM').
     """
     print(f"Unifying timestamps for column: {date_col}")
     try:
@@ -40,14 +40,14 @@ def unify_timestamps(df: pd.DataFrame, date_col: str, target_format: str = '%Y-%
 
 def normalize_data(series: pd.Series, method: Optional[str] = 'z-score') -> pd.Series:
     """
-    Normalizes a data series using the specified method.
+    Нормализует ряд данных с использованием указанного метода.
 
     Args:
-        series: Input data series.
-        method: Normalization method ('z-score', 'log', or None).
+        series: Входной ряд данных.
+        method: Метод нормализации ('z-score', 'log', или None).
 
     Returns:
-        Normalized data series.
+        Нормализованный ряд данных.
     """
     print(f"Normalizing series using method: {method}")
     if method == 'z-score':
@@ -82,16 +82,16 @@ def normalize_data(series: pd.Series, method: Optional[str] = 'z-score') -> pd.S
 
 def aggregate_monthly(df: pd.DataFrame, value_col: str, agg_func: str = 'mean') -> pd.Series:
     """
-    Aggregates data to a monthly frequency using the specified function.
-    Assumes df has a PeriodIndex ('M').
+    Агрегирует данные до месячной частоты с использованием указанной функции.
+    Предполагается, что df имеет PeriodIndex ('M').
 
     Args:
-        df: Input DataFrame with a monthly PeriodIndex.
-        value_col: Name of the column containing the values to aggregate.
-        agg_func: Aggregation function ('mean', 'sum', 'median', etc.).
+        df: Входной DataFrame с месячным PeriodIndex.
+        value_col: Имя столбца, содержащего значения для агрегации.
+        agg_func: Функция агрегации ('mean', 'sum', 'median' и т.д.).
 
     Returns:
-        Series with monthly aggregated values.
+        Series с месячными агрегированными значениями.
     """
     print(f"Aggregating column '{value_col}' monthly using '{agg_func}'")
     
