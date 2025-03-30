@@ -123,7 +123,6 @@ def summarize_granger_results(results_dict: Dict[Tuple[str, str], Dict[str, Any]
 if __name__ == '__main__':
     # Example usage (requires a fitted VAR model)
     print("\nTesting Granger causality functions...")
-    # Re-use VAR fitting example from var_model.py (or mock results)
 
     # --- Mocking VARResults ---
     # This part would typically use the actual results from fit_var_model

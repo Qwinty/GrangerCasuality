@@ -89,12 +89,25 @@ def check_stationarity_kpss(series: pd.Series, significance_level: float = 0.05,
         return False, 0.0  # Assume non-stationary on error (low p-value)
 
 
-def apply_differencing(series: pd.Series, order: int = 1) -> pd.Series:
-    """Applies differencing to a series."""
+def apply_differencing(data, order: int = 1):
+    """
+    Applies differencing to a series or dataframe.
+    
+    Args:
+        data: Time series data (pd.Series or pd.DataFrame)
+        order: Differencing order
+        
+    Returns:
+        Differenced data (same type as input)
+    """
     if order <= 0:
-        return series
-    print(f"Applying differencing of order {order} to series: {series.name}")
-    return series.diff(order).dropna()
+        return data
+    if isinstance(data, pd.Series):
+        print(f"Applying differencing of order {order} to series: {data.name}")
+        return data.diff(order).dropna()
+    else:  # DataFrame
+        print(f"Applying differencing of order {order} to dataframe with columns: {list(data.columns)}")
+        return data.diff(order).dropna()
 
 
 def check_stationarity_on_dataframe(df: pd.DataFrame, adf_level: float = 0.05, kpss_level: float = 0.05) -> Dict[str, Dict[str, Tuple[bool, float]]]:
