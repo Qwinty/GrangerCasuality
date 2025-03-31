@@ -1,11 +1,11 @@
 # src/visualization/diagnostics.py
-# Functions for plotting VAR model diagnostics like IRF and FEVD.
+# Функции для построения графиков диагностики VAR-моделей, таких как IRF и FEVD.
 
 import matplotlib.pyplot as plt
 from statsmodels.tsa.vector_ar.var_model import VARResults
 from typing import Optional, List
 
-# Apply plot style from config (optional)
+# Применить стиль графика из конфига (необязательно)
 # import matplotlib as mpl
 # try:
 #     import config
@@ -16,23 +16,23 @@ from typing import Optional, List
 
 def plot_impulse_response(results: VARResults, impulse: Optional[str] = None, response: Optional[str] = None, periods: int = 10, figsize: tuple = (12, 8), save_path: Optional[str] = None):
     """
-    Plots the Impulse Response Functions (IRF) for a fitted VAR model.
+    Строит графики функций импульсной характеристики (IRF) для подогнанной VAR-модели.
 
     Args:
-        results: Fitted VARResults object.
-        impulse: Name of the variable giving the impulse. If None, plots all impulses.
-        response: Name of the variable receiving the response. If None, plots all responses.
-        periods: Number of periods to plot the response for.
-        figsize: Size of the figure.
-        save_path: Optional path to save the plot.
+        results: Объект Fitted VARResults.
+        impulse: Имя переменной, задающей импульс. Если None, строятся графики всех импульсов.
+        response: Имя переменной, получающей отклик. Если None, строятся графики всех откликов.
+        periods: Количество периодов для построения графика отклика.
+        figsize: Размер фигуры.
+        save_path: Необязательный путь для сохранения графика.
     """
-    print(f"Plotting Impulse Response Functions (Periods: {periods})...")
+    print(f"Построение графиков функций импульсной характеристики (периоды: {periods})...")
     try:
-        # The plot method handles selecting specific impulse/response or plotting all
+        # Метод plot обрабатывает выбор конкретного импульса/отклика или построение графиков для всех
         irf = results.irf(periods=periods) # Calculate IRFs
 
-        # Create the plot. The `plot` method of irf object is flexible.
-        # It can plot orthogonalized IRFs by default.
+        # Создать график. Метод `plot` объекта irf является гибким.
+        # Он может строить графики ортогонализованных IRF по умолчанию.
         plot_kwargs = {'figsize': figsize}
         if impulse and response:
              plot_kwargs['impulse'] = impulse
@@ -45,53 +45,53 @@ def plot_impulse_response(results: VARResults, impulse: Optional[str] = None, re
              plot_kwargs['response'] = response
              print(f"  Responses of: {response}")
         else:
-             print("  Plotting all IRFs.")
+             print("  Построение графиков всех IRF.")
 
-        # The plot function returns a matplotlib Figure object
+        # Функция plot возвращает объект matplotlib Figure
         fig = irf.plot(**plot_kwargs)
-        fig.suptitle('Impulse Response Functions', fontsize=16)
-        plt.tight_layout(rect=[0, 0.03, 1, 0.95]) # Adjust layout to prevent title overlap
+        fig.suptitle('Функции импульсной характеристики', fontsize=16)
+        plt.tight_layout(rect=[0, 0.03, 1, 0.95]) # Настройка макета для предотвращения перекрытия заголовка
 
         if save_path:
-            print(f"Saving IRF plot to: {save_path}")
+            print(f"Сохранение графика IRF в: {save_path}")
             fig.savefig(save_path)
-            plt.close(fig) # Close plot if saving
+            plt.close(fig) # Закрыть график, если сохраняется
         else:
             plt.show()
 
     except Exception as e:
-        print(f"Error plotting Impulse Response Functions: {e}")
+        print(f"Ошибка при построении графиков функций импульсной характеристики: {e}")
 
 
 def plot_fevd(results: VARResults, periods: Optional[int] = None, figsize: tuple = (12, 8), save_path: Optional[str] = None):
     """
-    Plots the Forecast Error Variance Decomposition (FEVD).
+    Строит графики разложения дисперсии ошибки прогноза (FEVD).
 
     Args:
-        results: Fitted VARResults object.
-        periods: Number of steps ahead for FEVD. If None, uses model lag order.
-        figsize: Size of the figure.
-        save_path: Optional path to save the plot.
+        results: Объект Fitted VARResults.
+        periods: Количество шагов вперед для FEVD. Если None, используется порядок запаздывания модели.
+        figsize: Размер фигуры.
+        save_path: Необязательный путь для сохранения графика.
     """
-    print("Plotting Forecast Error Variance Decomposition...")
+    print("Построение графика разложения дисперсии ошибки прогноза...")
     try:
-        fevd = results.fevd(periods=periods) # Calculate FEVD
+        fevd = results.fevd(periods=periods) # Вычислить FEVD
 
-        # The plot method generates the FEVD summary plot
-        # It returns a matplotlib Figure object
+        # Метод plot создает сводный график FEVD
+        # Он возвращает объект matplotlib Figure
         fig = fevd.plot(figsize=figsize)
-        fig.suptitle('Forecast Error Variance Decomposition', fontsize=16)
-        plt.tight_layout(rect=[0, 0.03, 1, 0.95]) # Adjust layout
+        fig.suptitle('Разложение дисперсии ошибки прогноза', fontsize=16)
+        plt.tight_layout(rect=[0, 0.03, 1, 0.95]) # Настройка макета
 
         if save_path:
-            print(f"Saving FEVD plot to: {save_path}")
+            print(f"Сохранение графика FEVD в: {save_path}")
             fig.savefig(save_path)
-            plt.close(fig) # Close plot if saving
+            plt.close(fig) # Закрыть график, если сохраняется
         else:
             plt.show()
 
     except Exception as e:
-        print(f"Error plotting FEVD: {e}")
+        print(f"Ошибка при построении графика FEVD: {e}")
 
 
 if __name__ == '__main__':
@@ -99,40 +99,40 @@ if __name__ == '__main__':
     import pandas as pd
     from statsmodels.tsa.api import VAR
 
-    # Example usage (requires a fitted VAR model)
-    print("\nTesting diagnostic visualization functions...")
+    # Пример использования (требуется подогнанная VAR-модель)
+    print("\nТестирование функций визуализации диагностики...")
 
     # --- Reusing VAR fitting example ---
     idx = pd.period_range(start='2020-01', periods=100, freq='M')
-    data1 = np.random.randn(100).cumsum() # Non-stationary
+    data1 = np.random.randn(100).cumsum() # Нестационарный
     data2 = 0.5 * pd.Series(data1).shift(1).fillna(0) + np.random.randn(100) * 0.5
-    df_diag_test = pd.DataFrame({'Var1': np.diff(data1), 'Var2': np.diff(data2)}, index=idx[1:]) # Use differenced data
+    df_diag_test = pd.DataFrame({'Var1': np.diff(data1), 'Var2': np.diff(data2)}, index=idx[1:]) # Использовать дифференцированные данные
 
-    print("\nSample DataFrame for Diagnostics:")
+    print("\nПример DataFrame для диагностики:")
     print(df_diag_test.head())
 
-    var_lag = 2 # Assume optimal lag is 2
+    var_lag = 2 # Предположим, что оптимальный лаг равен 2
     try:
         model = VAR(df_diag_test)
         var_results_diag = model.fit(var_lag)
-        print("\nFitted Mock VAR Model for Diagnostics:")
-        # print(var_results_diag.summary()) # Optional: print summary
+        print("\nПодогнанная макетная VAR-модель для диагностики:")
+        # print(var_results_diag.summary()) # Необязательно: вывести сводку
 
-        # Test IRF plot (all)
+        # Тест графика IRF (все)
         plot_impulse_response(var_results_diag, periods=15)
         # plot_impulse_response(var_results_diag, periods=15, save_path="sample_irf_all.png")
 
-        # Test IRF plot (specific)
+        # Тест графика IRF (конкретный)
         # plot_impulse_response(var_results_diag, impulse='Var1', response='Var2', periods=15)
         # plot_impulse_response(var_results_diag, impulse='Var1', response='Var2', periods=15, save_path="sample_irf_v1_to_v2.png")
 
 
-        # Test FEVD plot
+        # Тест графика FEVD
         plot_fevd(var_results_diag, periods=15)
         # plot_fevd(var_results_diag, periods=15, save_path="sample_fevd.png")
 
 
     except Exception as e:
-        print(f"\nError during VAR fitting or diagnostic plotting in example: {e}")
+        print(f"\nОшибка во время подгонки VAR или построения диагностического графика в примере: {e}")
 
-    print("\nDiagnostic visualization test finished.")
+    print("\nТест визуализации диагностики завершен.")

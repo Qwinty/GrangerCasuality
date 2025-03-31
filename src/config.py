@@ -21,7 +21,7 @@ KPSS_SIGNIFICANCE_LEVEL = 0.05
 MAX_DIFFERENCING_ORDER = 2
 
 # VAR model settings
-MAX_LAG_ORDER = 12
+MAX_LAG_ORDER = 30
 LAG_SELECTION_CRITERIA = ["aic", "bic"] # Options: 'aic', 'bic', 'hqic', 'fpe'
 
 # Granger causality settings
@@ -29,7 +29,7 @@ GRANGER_SIGNIFICANCE_LEVEL = 0.05
 
 # Visualization settings
 PLOT_STYLE = "seaborn-v0_8-darkgrid"
-INTERACTIVE_PLOTS = False # Set to True for Plotly
+INTERACTIVE_PLOTS = True # Set to True for Plotly
 
 # Validation settings
 BOOTSTRAP_ITERATIONS = 1000

@@ -1,19 +1,19 @@
 # src/utils/logger.py
-# Logging configuration for the project.
+# Конфигурация логирования для проекта.
 
 import logging
 import sys
 from typing import Optional
 
 # --- Configuration ---
-# These could potentially be moved to or overridden by src/config.py
+# Это потенциально может быть перемещено или переопределено в src/config.py
 DEFAULT_LOG_LEVEL = "INFO"
 DEFAULT_LOG_FILE = "analysis.log"
 LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 # --- End Configuration ---
 
-# Store configured loggers to avoid duplicate handlers
+# Хранилище настроенных логгеров, чтобы избежать дублирования обработчиков
 _configured_loggers = {}
 
 
@@ -23,54 +23,54 @@ def setup_logger(name: str = 'granger_analysis',
                  use_console: bool = True,
                  use_file: bool = True) -> logging.Logger:
     """
-    Sets up and returns a logger instance.
+    Настраивает и возвращает экземпляр логгера.
 
-    Args:
-        name: Name of the logger.
-        log_level: Logging level (e.g., 'DEBUG', 'INFO'). Overrides default/config.
-        log_file: Path to the log file. Overrides default/config.
-        use_console: Whether to log to the console.
-        use_file: Whether to log to a file.
+    Аргументы:
+        name: Имя логгера.
+        log_level: Уровень логирования (например, 'DEBUG', 'INFO'). Переопределяет значение по умолчанию/из конфигурации.
+        log_file: Путь к файлу логов. Переопределяет значение по умолчанию/из конфигурации.
+        use_console: Следует ли выполнять логирование в консоль.
+        use_file: Следует ли выполнять логирование в файл.
 
-    Returns:
-        Configured logger instance.
+    Возвращает:
+        Настроенный экземпляр логгера.
     """
     global _configured_loggers
 
     if name in _configured_loggers:
         return _configured_loggers[name]
 
-    # Determine final log level and file path
+    # Определяем окончательный уровень логирования и путь к файлу
     final_log_level_str = log_level or DEFAULT_LOG_LEVEL
     final_log_file = log_file or DEFAULT_LOG_FILE
 
-    # Get numeric log level
+    # Получаем числовой уровень логирования
     numeric_level = getattr(logging, final_log_level_str.upper(), None)
     if not isinstance(numeric_level, int):
         print(
-            f"Warning: Invalid log level '{final_log_level_str}'. Defaulting to INFO.")
+            f"Предупреждение: Недопустимый уровень логирования '{final_log_level_str}'. Используется значение по умолчанию INFO.")
         numeric_level = logging.INFO
         final_log_level_str = "INFO"  # Update string representation
 
-    # Create logger
+    # Создаем логгер
     logger = logging.getLogger(name)
     logger.setLevel(numeric_level)
 
-    # Create formatter
+    # Создаем форматер
     formatter = logging.Formatter(LOG_FORMAT, datefmt=DATE_FORMAT)
 
-    # Remove existing handlers to prevent duplication if function is called again
-    # (Though _configured_loggers check should prevent this)
+    # Удаляем существующие обработчики, чтобы предотвратить дублирование, если функция вызывается снова
+    # (Хотя проверка _configured_loggers должна это предотвратить)
     if logger.hasHandlers():
         logger.handlers.clear()
 
-    # Console Handler
+    # Обработчик консоли
     if use_console:
         console_handler = logging.StreamHandler(sys.stdout)
         console_handler.setFormatter(formatter)
         logger.addHandler(console_handler)
 
-    # File Handler
+    # Обработчик файла
     if use_file and final_log_file:
         try:
             file_handler = logging.FileHandler(
@@ -78,45 +78,45 @@ def setup_logger(name: str = 'granger_analysis',
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
         except Exception as e:
-            print(f"Error setting up file handler for {final_log_file}: {e}")
+            print(f"Ошибка при настройке файлового обработчика для {final_log_file}: {e}")
             logger.error(f"Could not attach file handler to {final_log_file}")
 
-    # Prevent propagation to root logger if handlers are added
+    # Предотвращаем распространение в корневой логгер, если добавлены обработчики
     logger.propagate = False
 
     logger.info(
-        f"Logger '{name}' configured. Level: {final_log_level_str}. File: {final_log_file if use_file else 'None'}. Console: {use_console}.")
+        f"Логгер '{name}' сконфигурирован. Уровень: {final_log_level_str}. Файл: {final_log_file if use_file else 'None'}. Консоль: {use_console}.")
 
     _configured_loggers[name] = logger
     return logger
 
 
 if __name__ == '__main__':
-    # Example usage
-    print("Testing logger setup...")
+    # Пример использования
+    print("Тестирование настройки логгера...")
 
-    # Get default logger
+    # Получаем логгер по умолчанию
     logger1 = setup_logger()
-    logger1.debug("This is a debug message (should not appear by default).")
-    logger1.info("This is an info message.")
-    logger1.warning("This is a warning message.")
-    logger1.error("This is an error message.")
-    logger1.critical("This is a critical message.")
+    logger1.debug("Это отладочное сообщение (не должно отображаться по умолчанию).")
+    logger1.info("Это информационное сообщение.")
+    logger1.warning("Это сообщение-предупреждение.")
+    logger1.error("Это сообщение об ошибке.")
+    logger1.critical("Это критическое сообщение.")
 
-    print(f"\nCheck the log file: {DEFAULT_LOG_FILE}")
+    print(f"\nПроверьте файл логов: {DEFAULT_LOG_FILE}")
 
-    # Get another logger with different settings
+    # Получаем другой логгер с другими настройками
     logger2 = setup_logger(
         name='data_loader', log_level='DEBUG', log_file='data_loading.log')
-    logger2.debug("Debug message from data_loader.")
-    logger2.info("Info message from data_loader.")
+    logger2.debug("Отладочное сообщение от data_loader.")
+    logger2.info("Информационное сообщение от data_loader.")
 
-    print(f"Check the log file: data_loading.log")
+    print(f"Проверьте файл логов: data_loading.log")
 
-    # Get the first logger again (should return the same instance)
+    # Снова получаем первый логгер (должен вернуться тот же экземпляр)
     logger1_again = setup_logger()
     print(
-        f"\nIs logger1 the same as logger1_again? {logger1 is logger1_again}")
-    logger1_again.info("Another info message from the default logger.")
+        f"\nЯвляется ли logger1 тем же самым, что и logger1_again? {logger1 is logger1_again}")
+    logger1_again.info("Еще одно информационное сообщение от логгера по умолчанию.")
 
-    print("\nLogger test finished.")
+    print("\nТестирование логгера завершено.")

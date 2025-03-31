@@ -25,8 +25,7 @@ def select_optimal_lag(data: pd.DataFrame, max_lags: int, criteria: List[str] = 
         
     try:
         model = VAR(data)
-        # Note: statsmodels select_order might print results directly.
-        # We capture the results programmatically.
+        # Примечание: statsmodels select_order может выводить результаты напрямую.
         lag_selection_results = model.select_order(maxlags=max_lags)
         print("\nLag Selection Results Summary:")
         print("Результаты выбора порядка лагов:")
@@ -46,8 +45,8 @@ def select_optimal_lag(data: pd.DataFrame, max_lags: int, criteria: List[str] = 
             print(f"  {crit.upper()}: {lag}")
 
         return {
-            **optimal_lags, # Unpack the optimal lags (e.g., 'aic': 1, 'bic': 1)
-            'summary': lag_selection_results # Add the summary object
+            **optimal_lags, # Распаковка оптимальных лагов (например, 'aic': 1, 'bic': 1)
+            'summary': lag_selection_results # Добавить объект summary
         }
 
     except Exception as e:
@@ -114,7 +113,7 @@ f"\nПроверка стабильности модели: {'Стабильна
 
 
 if __name__ == '__main__':
-    # Example usage (for testing purposes)
+    # Пример использования (в целях тестирования)
     print("\nТестирование функций VAR модели...")
 
     # Создание примера стационарных данных

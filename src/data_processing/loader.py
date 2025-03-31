@@ -1,5 +1,5 @@
 # src/data_processing/loader.py
-# Functions for loading the raw datasets.
+# Функции для загрузки необработанных наборов данных.
 
 import pandas as pd
 from typing import Tuple
@@ -19,49 +19,49 @@ MORTALITY_COL_MAP = {
 
 def load_temperature_data(filepath: str) -> pd.DataFrame:
     """Загружает данные о температуре из текстового файла."""
-    print(f"Loading temperature data from: {filepath}")
+    print(f"Загрузка данных о температуре из: {filepath}")
     try:
         df = pd.read_csv(filepath, delimiter=';', encoding='utf-8')
         df = df.rename(columns=TEMP_COL_MAP)
-        # Combine Year, Month, Day into a datetime object
+        # Объединение Year, Month, Day в объект datetime
         df['Date'] = pd.to_datetime(df[['Year', 'Month', 'Day']])
-        # Select relevant columns
+        # Выбор релевантных столбцов
         df = df[['Date', 'Temperature', 'Precipitation']]
-        print("Temperature data loaded successfully.")
+        print("Данные о температуре успешно загружены.")
         return df
     except FileNotFoundError:
-        print(f"Error: File not found at {filepath}")
+        print(f"Ошибка: Файл не найден по адресу {filepath}")
         return pd.DataFrame()
     except Exception as e:
-        print(f"Error loading temperature data: {e}")
+        print(f"Ошибка загрузки данных о температуре: {e}")
         return pd.DataFrame()
 
 
 def load_secondary_data(filepath: str) -> pd.DataFrame:
     """Загружает вторичный набор данных (ДТП или Смертность) из CSV файла."""
-    print(f"Loading secondary data from: {filepath}")
+    print(f"Загрузка вторичных данных из: {filepath}")
     try:
         if 'mortality' in filepath:
             df = pd.read_csv(filepath, delimiter=',', encoding='utf-8')
-            # Combine Year and Month name into a datetime object (start of month)
-            # Convert month names if they are not numeric (e.g., 'January')
-            # Assuming month names are in English for this example
+            # Объединение Year и Month name в объект datetime (начало месяца)
+            # Преобразование названий месяцев, если они не числовые (например, 'January')
+            # Предполагается, что названия месяцев на английском языке
             try:
                 df['Date'] = pd.to_datetime(df['Year'].astype(
                     str) + '-' + df['Month'], format='%Y-%B')
             except ValueError:
-                # Fallback if month is numeric or different format
+                # Запасной вариант, если месяц числовой или в другом формате
                 df['Date'] = pd.to_datetime(df['Year'].astype(
                     str) + '-' + df['Month'].astype(str))
 
             df = df.rename(columns=MORTALITY_COL_MAP)
-            # Select relevant columns
+            # Выбор релевантных столбцов
             df = df[['Date', 'Mortality']]  # Add other columns if needed
-            print("Mortality data loaded successfully.")
+            print("Данные о смертности успешно загружены.")
             return df
         elif 'dtp' in filepath:
-            # Specify encoding AND header row index
-            # Use parse_dates directly in read_csv
+            # Укажите кодировку И индекс строки заголовка
+            # Использовать parse_dates непосредственно в read_csv
             date_col_name = 'Дата(месяц,год)'
             try:
                 df = pd.read_csv(
@@ -69,38 +69,38 @@ def load_secondary_data(filepath: str) -> pd.DataFrame:
                     delimiter=';',
                     encoding='utf-8',
                     header=0,
-                    parse_dates=[date_col_name],  # Specify column to parse
-                    date_format='%m.%Y'          # Specify format for the parser
+                    parse_dates=[date_col_name],  # Укажите столбец для анализа
+                    date_format='%m.%Y'          # Укажите формат для парсера
                 )
-                # Rename the parsed date column to 'Date' for consistency
+                # Переименование проанализированного столбца даты в 'Date' для согласованности
                 df = df.rename(columns={date_col_name: 'Date'})
             except ValueError as e:
-                # If direct parsing fails, fall back to manual parsing (previous attempt)
+                # Если прямая обработка не удалась, вернуться к ручной обработке (предыдущая попытка)
                 print(
-                    f"Direct date parsing failed ({e}), attempting manual parsing...")
+                    f"Прямой анализ даты не удался ({e}), попытка ручного анализа...")
                 df = pd.read_csv(filepath, delimiter=';',
                                  encoding='utf-8', header=0)
                 df['Date'] = pd.to_datetime(df[date_col_name], format='%m.%Y')
 
-            # Parse 'Дата(месяц,год)' which is in MM.YYYY format
-            # df['Date'] = pd.to_datetime(df['Дата(месяц,год)'], format='%m.%Y') # Now handled by parse_dates
-            # Rename columns if needed (assuming 'ДТП' is the target)
+            # Разобрать 'Дата(месяц,год)', который находится в формате MM.YYYY
+            # df['Date'] = pd.to_datetime(df['Дата(месяц,год)'], format='%m.%Y') # Теперь обрабатывается parse_dates
+            # Переименование столбцов, если необходимо (предполагая, что 'ДТП' является целью)
             df = df.rename(
                 columns={'ДТП': 'DTP', 'Погибло': 'Deaths', 'Ранено': 'Injured'})
-            # Select relevant columns
+            # Выбор релевантных столбцов
             df = df[['Date', 'DTP', 'Deaths', 'Injured']]
-            print("DTP data loaded successfully.")
+            print("Данные ДТП успешно загружены.")
             return df
         else:
             print(
-                f"Error: Unknown secondary data file type for path: {filepath}")
+                f"Ошибка: Неизвестный тип файла вторичных данных для пути: {filepath}")
             return pd.DataFrame()
 
     except FileNotFoundError:
-        print(f"Error: File not found at {filepath}")
+        print(f"Ошибка: Файл не найден по адресу {filepath}")
         return pd.DataFrame()
     except Exception as e:
-        print(f"Error loading secondary data: {e}")
+        print(f"Ошибка загрузки вторичных данных: {e}")
         return pd.DataFrame()
 
 
@@ -112,31 +112,31 @@ def load_all_data(temp_path: str, secondary_path: str) -> Tuple[pd.DataFrame, pd
 
 
 if __name__ == '__main__':
-    # Example usage (for testing purposes)
+    # Пример использования (в целях тестирования)
     import sys
     sys.path.append('..')  # Add parent directory to path to import config
     import config
 
-    # Use absolute paths for testing if running script directly from data_processing
+    # Использовать абсолютные пути для тестирования, если скрипт запускается непосредственно из data_processing
     # base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
     # temp_path_test = os.path.join(base_path, config.TEMP_DATA_PATH)
     # secondary_path_test = os.path.join(base_path, config.SECONDARY_DATA_PATH)
 
-    print("Testing data loading functions...")
-    # Use paths directly from config, assuming script/notebook is run from project root
+    print("Тестирование функций загрузки данных...")
+    # Использовать пути непосредственно из config, предполагая, что скрипт/блокнот запускается из корня проекта
     df_temp, df_secondary = load_all_data(
         config.TEMP_DATA_PATH, config.SECONDARY_DATA_PATH)
 
     if not df_temp.empty:
-        print("\nTemperature Data Head:")
+        print("\nЗаголовок данных о температуре:")
         print(df_temp.head())
-        print("\nTemperature Data Info:")
+        print("\nИнформация о данных о температуре:")
         df_temp.info()
 
     if not df_secondary.empty:
-        print("\nSecondary Data Head:")
+        print("\nЗаголовок вторичных данных:")
         print(df_secondary.head())
-        print("\nSecondary Data Info:")
+        print("\nИнформация о вторичных данных:")
         df_secondary.info()
 
-    print("\nData loading test finished.")
+    print("\nТест загрузки данных завершен.")

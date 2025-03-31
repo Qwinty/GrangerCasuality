@@ -1,5 +1,5 @@
 # src/data_processing/merger.py
-# Functions for merging the preprocessed time series data.
+# Функции для объединения предварительно обработанных данных временных рядов.
 
 import pandas as pd
 from typing import Tuple
@@ -8,25 +8,25 @@ import numpy as np
 
 def merge_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, how: str = 'inner') -> pd.DataFrame:
     """
-    Merges two DataFrames based on their indices (assumed to be time-based).
+    Объединяет два DataFrame на основе их индексов (предполагается, что они основаны на времени).
 
     Args:
-        df1: First DataFrame.
-        df2: Second DataFrame.
-        how: Type of merge to be performed ('inner', 'outer', 'left', 'right').
-             'inner' is recommended to keep only overlapping time periods.
+        df1: Первый DataFrame.
+        df2: Второй DataFrame.
+        how: Тип объединения для выполнения ('inner', 'outer', 'left', 'right').
+             'inner' рекомендуется для сохранения только перекрывающихся временных периодов.
 
     Returns:
-        Merged DataFrame.
+        Объединенный DataFrame.
     """
-    print(f"Merging dataframes using method: {how}")
+    print(f"Объединение датафреймов с использованием метода: {how}")
     if not isinstance(df1.index, (pd.PeriodIndex, pd.DatetimeIndex)) or \
        not isinstance(df2.index, (pd.PeriodIndex, pd.DatetimeIndex)):
-        print("Warning: One or both DataFrames do not have a time-based index. Merge might be incorrect.")
+        print("Предупреждение: Один или оба DataFrame не имеют временного индекса. Объединение может быть некорректным.")
 
     try:
-        # Ensure indices are compatible (e.g., both PeriodIndex or both DatetimeIndex)
-        # If one is PeriodIndex and other is DatetimeIndex, convert one for merging
+        # Убедитесь, что индексы совместимы (например, оба PeriodIndex или оба DatetimeIndex)
+        # Если один PeriodIndex, а другой DatetimeIndex, преобразуйте один для объединения
         if isinstance(df1.index, pd.PeriodIndex) and isinstance(df2.index, pd.DatetimeIndex):
             df2.index = df2.index.to_period(df1.index.freq)
         elif isinstance(df2.index, pd.PeriodIndex) and isinstance(df1.index, pd.DatetimeIndex):
@@ -35,78 +35,77 @@ def merge_dataframes(df1: pd.DataFrame, df2: pd.DataFrame, how: str = 'inner') -
         merged_df = pd.merge(df1, df2, left_index=True,
                              right_index=True, how=how)
 
-        # Check for duplicate column names after merge (if dfs had same column names initially)
+        # Проверка на дублирующиеся имена столбцов после объединения (если у dfs изначально были одинаковые имена столбцов)
         if merged_df.columns.duplicated().any():
-            print("Warning: Merged DataFrame contains duplicate column names. Consider renaming columns before merging.")
+            print("Предупреждение: Объединенный DataFrame содержит дублирующиеся имена столбцов. Рассмотрите возможность переименования столбцов перед объединением.")
 
-        print("DataFrames merged successfully.")
+        print("DataFrame успешно объединены.")
         return merged_df
     except Exception as e:
-        print(f"Error merging DataFrames: {e}")
-        return pd.DataFrame()  # Return empty DataFrame on error
+        print(f"Ошибка объединения DataFrame: {e}")
+        return pd.DataFrame()  # Возвращает пустой DataFrame в случае ошибки
 
 
 def check_completeness(df: pd.DataFrame) -> None:
     """
     Проверяет объединенный DataFrame на наличие пропущенных значений и временных пробелов.
     """
-    print("Checking merged data completeness...")
+    print("Проверка полноты объединенных данных...")
     missing_values = df.isnull().sum()
     if missing_values.sum() > 0:
-        print("Missing values found:")
+        print("Обнаружены пропущенные значения:")
         print(missing_values[missing_values > 0])
     else:
-        print("No missing values found.")
+        print("Пропущенные значения не обнаружены.")
 
     if isinstance(df.index, (pd.PeriodIndex, pd.DatetimeIndex)):
-        # Check for gaps in the time index
+        # Проверка на пропуски во временном индексе
         expected_index = pd.period_range(start=df.index.min(), end=df.index.max(), freq=df.index.freq) if isinstance(
             df.index, pd.PeriodIndex) else pd.date_range(start=df.index.min(), end=df.index.max(), freq=df.index.freq)
         if len(df.index) != len(expected_index):
             print(
-                f"Warning: Time series gaps detected. Expected {len(expected_index)} periods, found {len(df.index)}.")
-            # Optionally, identify the missing periods/dates
+                f"Предупреждение: Обнаружены пропуски во временном ряду. Ожидается {len(expected_index)} периодов, найдено {len(df.index)}.")
+            # При необходимости определите отсутствующие периоды/даты
             missing_periods = expected_index.difference(df.index)
-            print(f"Missing periods/dates: {missing_periods}")
+            print(f"Пропущенные периоды/даты: {missing_periods}")
         else:
-            print("Time series index is continuous (no gaps).")
+            print("Индекс временного ряда непрерывный (нет пропусков).")
     else:
-        print("Index is not time-based, skipping gap check.")
-
+        print("Индекс не основан на времени, пропуск проверки на пропуски.")
 
 if __name__ == '__main__':
-    # Example usage (for testing purposes)
-    print("\nTesting data merging functions...")
+    # Пример использования (в целях тестирования)
+    print("\nТестирование функций объединения данных...")
 
-    # Create sample preprocessed data
+    # Создание примера предварительно обработанных данных
     idx1 = pd.period_range(start='2020-01', periods=12, freq='M')
     df_temp_processed = pd.DataFrame(
         {'Temperature_Norm': np.random.randn(12)}, index=idx1)
 
-    # Overlapping but different start/end
+    # Перекрывающиеся, но с разными началом/концом
     idx2 = pd.period_range(start='2020-03', periods=12, freq='M')
     df_secondary_processed = pd.DataFrame(
         {'Secondary_Norm': np.random.rand(12)}, index=idx2)
 
-    print("\nSample Processed Temperature Data:")
+    print("\nПример обработанных данных о температуре:")
     print(df_temp_processed)
-    print("\nSample Processed Secondary Data:")
+    print("\nПример обработанных вторичных данных:")
     print(df_secondary_processed)
 
-    # Test inner merge
+    # Тест внутреннего объединения
     merged_inner = merge_dataframes(
         df_temp_processed, df_secondary_processed, how='inner')
-    print("\nMerged DataFrame (Inner):")
+    print("\nОбъединенный DataFrame (Inner):")
     print(merged_inner)
     if not merged_inner.empty:
         check_completeness(merged_inner)
 
-    # Test outer merge
+    # Тест внешнего объединения
     merged_outer = merge_dataframes(
         df_temp_processed, df_secondary_processed, how='outer')
-    print("\nMerged DataFrame (Outer):")
+    print("\nОбъединенный DataFrame (Outer):")
     print(merged_outer)
     if not merged_outer.empty:
-        check_completeness(merged_outer)  # Expect missing values here
+        check_completeness(merged_outer)  # Ожидаем здесь пропущенные значения
 
-    print("\nData merging test finished.")
+    print("\nТест объединения данных завершен.")
