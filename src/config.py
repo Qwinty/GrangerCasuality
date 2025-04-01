@@ -24,7 +24,7 @@ KPSS_SIGNIFICANCE_LEVEL = 0.05
 MAX_DIFFERENCING_ORDER = 2
 
 # Настройки VAR модели
-MAX_LAG_ORDER = 12
+MAX_LAG_ORDER = 12 # Кол-во месяцев в виде лага
 LAG_SELECTION_CRITERIA = ["aic", "bic"] # Варианты: 'aic', 'bic', 'hqic', 'fpe'
 
 # Настройки причинности Грейнджера

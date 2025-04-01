@@ -103,14 +103,7 @@ qwinty-grangercasuality/
 
 ## Установка
 
-1. **Клонируйте репозиторий:**
-
-    ```bash
-    git clone <url-репозитория>
-    cd qwinty-grangercasuality
-    ```
-
-2. **Создайте и активируйте виртуальное окружение (рекомендуется):**
+1. **Создайте и активируйте виртуальное окружение (рекомендуется):**
 
     ```bash
     python -m venv venv
@@ -120,16 +113,10 @@ qwinty-grangercasuality/
     source venv/bin/activate
     ```
 
-3. **Установите зависимости:**
+2. **Установите зависимости:**
 
     ```bash
     pip install -r requirements.txt
-    ```
-
-    *Примечание: Файл `requirements.txt` не предоставлен, но основные зависимости, скорее всего:*
-
-    ```bash
-    pip install pandas numpy statsmodels matplotlib seaborn scipy plotly
     ```
 
 ## Конфигурация
