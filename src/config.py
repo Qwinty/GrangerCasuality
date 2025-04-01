@@ -5,11 +5,11 @@
 TEMP_DATA_PATH = "../data/Moscow_Temp (2010-2024).csv"
 
 # Выберите один из следующих вариантов для второго набора данных:
-# SECONDARY_DATA_PATH = "../data/Moscow/moscow_mortality.csv"
-# SECONDARY_DATA_NAME = "Mortality"
+SECONDARY_DATA_PATH = "../data/Moscow/moscow_mortality.csv"
+SECONDARY_DATA_NAME = "Mortality"
 
-SECONDARY_DATA_PATH = "../data/Moscow/moscow_dtp_transformed.csv"
-SECONDARY_DATA_NAME = "DTP"
+# SECONDARY_DATA_PATH = "../data/Moscow/moscow_dtp_transformed.csv"
+# SECONDARY_DATA_NAME = "DTP"
 
 # Настройки предварительной обработки
 DATE_FORMAT = "%Y-%m"
@@ -32,7 +32,7 @@ GRANGER_SIGNIFICANCE_LEVEL = 0.05
 
 # Настройки визуализации
 PLOT_STYLE = "seaborn-v0_8-darkgrid"
-INTERACTIVE_PLOTS = False # Установите значение True для Plotly
+INTERACTIVE_PLOTS = True # Установите значение True для Plotly
 
 # Настройки валидации
 BOOTSTRAP_ITERATIONS = 1000
